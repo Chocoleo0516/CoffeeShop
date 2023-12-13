@@ -10,6 +10,6 @@ class Ingredient:
             "Latte": {"milk": 300, "beans": 8, "spices": 3}
         }
 
-    def get_ingredients(self, coffee_type):
+    def get_ingredient(self, coffee_type):
         # 返回指定咖啡类型所需的原料量
         return self.coffee_recipes.get(coffee_type, {})
