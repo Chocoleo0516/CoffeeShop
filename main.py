@@ -47,9 +47,14 @@ def main():
                     sell = get_integer_input("劳动力不足，请重新输入：")
 
             shop.update_inventory(coffee_type, sell)    #根据咖啡类型和数量更新库存
-        shop.cash -= shop.cash_spend()
+        
+        shop.cash -= (shop.cash_spend() + shop.storage_cost()) 
 
-        shop.current()
+        shop.current()  #显示商店补充原料前的状态
+
+        shop.inventory_depreciation()   #计算折旧
+    
+        shop.buy_ingredient()   #加满仓库并更新现金
         if shop.cash < 0:
             print("破产了！")
             break

@@ -1,4 +1,4 @@
-from ingredient import Ingredient  # 导入 Ingredient 类
+from ingredient import Ingredient  # 导入Ingredient类
 from barista import Barista #导入Barista类
 from labordemand import Labordemand
 
@@ -21,7 +21,8 @@ class CoffeeShop:       #缺少错误处理
         self.labor = len(self.barista) * 80 * 60    #每月劳动力总量(minutes)
 
     def storage_cost(self):
-        milk_cost = self.inventory.get("milk") * 0.10
+        #计算原料储存费用
+        milk_cost = self.inventory.get("milk") * 0.0001
         beans_cost = self.inventory.get("beans") * 0.001
         spices_cost = self.inventory.get("spices") * 0.001
         return milk_cost + beans_cost + spices_cost
@@ -54,7 +55,7 @@ class CoffeeShop:       #缺少错误处理
             print(f"咖啡师 {barista_name} 不存在于员工名单中。")
 
     def cash_spend(self):
-        #这里只包含工资与租金，不包含购买原料的价格
+        #不包含购买原料的花销
         wage = len(self.barista)*15*120
         return wage + self.rent
     
@@ -79,7 +80,11 @@ class CoffeeShop:       #缺少错误处理
 
         return True
 
-    
+    def inventory_depreciation(self):
+        #计算折旧
+        self.inventory["milk"] *= 0.6
+        self.inventory["beans"] *= 0.9
+
     def update_inventory(self, coffee_type, quantity):
         #根据咖啡类型和数量更新库存
         recipe = self.ingredient.get_ingredient(coffee_type)
@@ -89,6 +94,14 @@ class CoffeeShop:       #缺少错误处理
                     self.inventory[ingredient] -= amount_per_unit * quantity
         else:
             print(f"未知的咖啡类型: {coffee_type}")
+
+    def buy_ingredient(self):
+        #购买原材料并加满仓库，更新现金
+        buy_milk = (300000 - self.inventory["milk"]) * 0.0003
+        buy_beans = (20000 - self.inventory["beans"]) * 0.1
+        buy_spices = (4000- self.inventory ["spices"]) * 0.05
+        self.inventory = {"milk": 300000, "beans": 20000, "spices": 4000}   #加满仓库
+        self.cash -= (buy_milk + buy_beans + buy_spices)
     
     def current(self):
         #显示咖啡店的当前状态
