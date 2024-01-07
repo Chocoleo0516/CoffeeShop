@@ -9,4 +9,4 @@ class Labordemand:
         }
     
     def get_demand(self, coffee_type):
-        return self.demand.get(coffee_type)
+        return self.demand[coffee_type]

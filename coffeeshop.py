@@ -23,9 +23,9 @@ class CoffeeShop:       #缺少错误处理
 
     def storage_cost(self):
         #计算原料储存费用
-        milk_cost = self.inventory.get("milk") * 0.0001
-        beans_cost = self.inventory.get("beans") * 0.001
-        spices_cost = self.inventory.get("spices") * 0.001
+        milk_cost = self.inventory["milk"] * 0.0001
+        beans_cost = self.inventory["beans"] * 0.001
+        spices_cost = self.inventory["spices"] * 0.001
         return milk_cost + beans_cost + spices_cost
 
     # def update_labor(self):
@@ -86,12 +86,12 @@ class CoffeeShop:       #缺少错误处理
     def sell_coffee(self, coffee_type, quantity):
         #检查是否有足够的原料
         for ingredient, amount_per_unit in self.ingredient.coffee_recipes[coffee_type].items():
-            if self.inventory.get(ingredient) < amount_per_unit * quantity:
+            if self.inventory[ingredient] < amount_per_unit * quantity:
                 print(f"原料不足，无法制作 {quantity} 杯 {coffee_type}")
                 return False
 
         #计算收入并更新现金
-        price_per_cup = self.prices.get(coffee_type)
+        price_per_cup = self.prices[coffee_type]
         income = quantity * price_per_cup
         self.cash += income
         print(f"成功销售 {quantity} 杯 {coffee_type}，收入 {income}")
@@ -104,6 +104,17 @@ class CoffeeShop:       #缺少错误处理
             self.labor["general"] -= (required_labor - self.labor[coffee_type]*2)
             self.labor[coffee_type] = 0
         return True
+
+    def calculate_production(self, coffee_type):
+        # 计算基于劳动力的最大产量
+        max_labor = (self.labor["general"] + (self.labor[coffee_type] * 2)) // self.labordemand.get_demand(coffee_type)
+
+        # 计算基于原料的最大产量
+        ingredient = self.ingredient.get_ingredient(coffee_type)
+        max_ingredients = min(self.inventory[ingredient] // amount for ingredient, amount in ingredient.items())
+
+        # 返回两者中的最小值
+        return min(max_labor, max_ingredients)
 
     def inventory_depreciation(self):
         #计算折旧
@@ -131,8 +142,10 @@ class CoffeeShop:       #缺少错误处理
     def current(self):
         #显示咖啡店的当前状态
         print(f"Cash surplus: {self.cash}")  #打印剩余现金
-        print("Inventory:", self.inventory) #打印库存      
-        print("Barista:")  #打印咖啡师名字
-        for b in self.barista:
-            print(b)
+        print("Inventory:", self.inventory) #打印库存 
+        for barista in self.barista:
+            name = barista.get_name()
+            specialty = barista.get_specialty() if barista.get_specialty() else "无专长"
+            print(f"咖啡师 {name}，专长：{specialty}")     
+
 

@@ -22,10 +22,18 @@ def main():
 
         #改变咖啡师人数
         barista_change = get_integer_input("输入咖啡师人数变化（正数增加，负数减少，0无变化）：")
+        while (len(shop.barista) + barista_change) < 1:
+            barista_change = get_integer_input("最少需要一个咖啡师，请重新输入:")
         for n in range(1, abs(barista_change)+1):
             if barista_change > 0:
                 name = input(f"添加的第{n}个咖啡师名字是：")
-                specialty = input('专长是(请在Espresso, Americano, Filter, Macchiato0, Flat White, Latte中选择，注意大小写。如果没有专长，请输入0)：')
+                while True:
+                    specialty = input('专长是(请在Espresso, Americano, Filter, Macchiato, Flat White, Latte中选择，注意大小写。如果没有专长，请输入0)：')
+                    # 检查输入是否正确
+                    if specialty in shop.ingredient.coffee_recipes or specialty == '0':
+                        break
+                    else:
+                        print("输入的专长不正确，请重新输入。")
                 if specialty == "0" :
                     specialty = None
                 shop.add_barista(name, specialty)
@@ -41,16 +49,20 @@ def main():
             demand = coffee_demand.get_demand(coffee_type)
             print(f"{coffee_type}，需求量：{demand}")
             sell = get_integer_input(f"{coffee_type}卖多少：") #quantity
-        
+            while sell > demand:
+                    sell = get_integer_input(f"出售量 {sell} 大于需求量 {demand}，请重新输入。")
+
             #判断原料供应量与劳动力是否充足，如果充足则资金发生改变
             while True:
                 if shop.is_labor_sufficient(coffee_type, sell):
                     if shop.sell_coffee(coffee_type, sell):
                          break  #如果原料和劳动力都足够，跳出循环                       
                     else:
-                        sell = get_integer_input("原材料不足，请重新输入：")
+                        production = shop.calculate_production(coffee_type)
+                        sell = get_integer_input(f"原材料不足，请重新输入(产能为：{production}):")
                 else:
-                    sell = get_integer_input("劳动力不足，请重新输入：")
+                    production = shop.calculate_production(coffee_type)
+                    sell = get_integer_input(f"劳动力不足，请重新输入(产能为：{production})：")
 
             shop.update_inventory(coffee_type, sell)    #根据咖啡类型和数量更新库存
         

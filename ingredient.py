@@ -12,4 +12,4 @@ class Ingredient:
 
     def get_ingredient(self, coffee_type):
         # 返回指定咖啡类型所需的原料量
-        return self.coffee_recipes.get(coffee_type, {})
+        return self.coffee_recipes[coffee_type]
