@@ -25,10 +25,16 @@ def main():
         for n in range(1, abs(barista_change)+1):
             if barista_change > 0:
                 name = input(f"添加的第{n}个咖啡师名字是：")
-                shop.add_barista(name)
+                specialty = input('专长是(请在Espresso, Americano, Filter, Macchiato0, Flat White, Latte中选择，注意大小写。如果没有专长，请输入0)：')
+                if specialty == "0" :
+                    specialty = None
+                shop.add_barista(name, specialty)
             if barista_change < 0:
                 name = input(f"删除的第{n}个咖啡师名字是：")
                 shop.remove_barista(name)
+
+        #更新劳动力
+        shop.update_labor()  #更新劳动力
 
         #销售咖啡
         for coffee_type in shop.ingredient.coffee_recipes:

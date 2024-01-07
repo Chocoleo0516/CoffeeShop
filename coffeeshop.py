@@ -18,7 +18,8 @@ class CoffeeShop:       #缺少错误处理
         self.ingredient = Ingredient()    #创建Ingredirnt实例
         self.barista = []  #储存Barista实例
         self.labordemand = Labordemand()
-        self.labor = len(self.barista) * 80 * 60    #每月劳动力总量(minutes)
+        #self.labor = len(self.barista) * 80 * 60    #初始的计算每月劳动力总量(minutes)
+        self.labor = {"general": 0, "Espresso": 0, "Americano": 0, "Filter": 0, "Macchiato": 0, "Flat White": 0, "Latte": 0}
 
     def storage_cost(self):
         #计算原料储存费用
@@ -27,20 +28,33 @@ class CoffeeShop:       #缺少错误处理
         spices_cost = self.inventory.get("spices") * 0.001
         return milk_cost + beans_cost + spices_cost
 
-    def update_labor(self):
-        #更新劳动力
-        self.labor = len(self.barista) * 80 * 60
+    # def update_labor(self):
+    #     #初始的更新劳动力
+    #     self.labor = len(self.barista) * 80 * 60
 
-    def add_barista(self, barista_name):
+    def update_labor(self): #更新劳动力
+        #重置劳动力
+        for coffee in self.labor:
+            self.labor[coffee] = 0
+        #根据专长更新劳动力
+        for barista in self.barista:
+            specialty = barista.get_specialty()
+            if specialty:
+                self.labor[specialty] += 80*60
+            else:
+                self.labor["general"] += 80 * 60
+
+
+    def add_barista(self, barista_name, specialty = None):
         #添加咖啡师
         #检查咖啡师名字是否已经存在
         for barista in self.barista:
             if barista.get_name() == barista_name:
                 print(f"咖啡师 {barista_name} 已存在，请输入不同的名字。")
                 return  #提前结束方法
-        new_barista = Barista(barista_name)
+        new_barista = Barista(barista_name, specialty)
         self.barista.append(new_barista)
-        self.update_labor()  #更新劳动力
+        # self.update_labor()  #更新劳动力
         print(f"咖啡师 {barista_name} 已添加到员工名单。")
 
     def remove_barista(self, barista_name):
@@ -49,7 +63,7 @@ class CoffeeShop:       #缺少错误处理
             if barista.get_name() == barista_name:
                 self.barista.remove(barista)
                 print(f"咖啡师 {barista_name} 被移除。")
-                self.update_labor()  #更新劳动力
+                # self.update_labor()  #更新劳动力
                 break
         else:   #循环正常结束时执行
             print(f"咖啡师 {barista_name} 不存在于员工名单中。")
@@ -58,11 +72,16 @@ class CoffeeShop:       #缺少错误处理
         #不包含购买原料的花销
         wage = len(self.barista)*15*120
         return wage + self.rent
-    
-    def is_labor_sufficient(self, coffee_type, quantity):
-        #检查是否有足够的劳动力
+
+    # def is_labor_sufficient(self, coffee_type, quantity):
+    #     #初始的检查是否有足够的劳动力
+    #     required_labor = quantity * self.labordemand.get_demand(coffee_type)
+    #     return self.labor >= required_labor
+
+    def is_labor_sufficient(self, coffee_type, quantity):   #检查是否有足够的劳动力
         required_labor = quantity * self.labordemand.get_demand(coffee_type)
-        return self.labor >= required_labor
+        available_labor = self.labor["general"] + (self.labor[coffee_type] * 2)
+        return available_labor >= required_labor
 
     def sell_coffee(self, coffee_type, quantity):
         #检查是否有足够的原料
@@ -71,13 +90,19 @@ class CoffeeShop:       #缺少错误处理
                 print(f"原料不足，无法制作 {quantity} 杯 {coffee_type}")
                 return False
 
-        #计算收入并更新现金与劳动力
+        #计算收入并更新现金
         price_per_cup = self.prices.get(coffee_type)
         income = quantity * price_per_cup
         self.cash += income
         print(f"成功销售 {quantity} 杯 {coffee_type}，收入 {income}")
-        self.labor -= quantity * self.labordemand.get_demand(coffee_type)
-
+        # self.labor -= quantity * self.labordemand.get_demand(coffee_type) #初始更新劳动力
+        #更新劳动力
+        required_labor = quantity * self.labordemand.get_demand(coffee_type)
+        if self.labor[coffee_type] >= (required_labor/2):
+            self.labor[coffee_type] -= (required_labor/2)
+        else:
+            self.labor["general"] -= (required_labor - self.labor[coffee_type]*2)
+            self.labor[coffee_type] = 0
         return True
 
     def inventory_depreciation(self):
