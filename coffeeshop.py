@@ -1,12 +1,12 @@
-from ingredient import Ingredient  # 导入Ingredient类
-from barista import Barista #导入Barista类
+from ingredient import Ingredient  
+from barista import Barista
 from labordemand import Labordemand
 
-class CoffeeShop:       #缺少错误处理
+class CoffeeShop:       
     def __init__(self):
-        self.cash = 10000   #初始现金
-        self.rent = 1500    #每月租金
-        self.inventory = {"milk": 300000, "beans": 20000, "spices": 4000}   #创建一个字典来储存初始原料
+        self.cash = 10000   #Initial cash
+        self.rent = 1500    #Monthly rent
+        self.inventory = {"milk": 300000, "beans": 20000, "spices": 4000}   #creat a dictionary to store inventory
         self.prices = {
             "Espresso": 1.5,
             "Americano": 2.5,
@@ -14,29 +14,29 @@ class CoffeeShop:       #缺少错误处理
             "Macchiato": 3.0,
             "Flat White": 3.5,
             "Latte": 4.0
-        }   #创建字典储存咖啡售价
-        self.ingredient = Ingredient()    #创建Ingredirnt实例
-        self.barista = []  #储存Barista实例
+        }   #Create a dictionary to store coffee selling prices
+        self.ingredient = Ingredient()    #Creating an instance of Ingredirnt
+        self.barista = []  #Store Barista instances
         self.labordemand = Labordemand()
-        #self.labor = len(self.barista) * 80 * 60    #初始的计算每月劳动力总量(minutes)
+        #self.labor = len(self.barista) * 80 * 60    #Initial calculation of total monthly labour force(minutes)
         self.labor = {"general": 0, "Espresso": 0, "Americano": 0, "Filter": 0, "Macchiato": 0, "Flat White": 0, "Latte": 0}
 
     def storage_cost(self):
-        #计算原料储存费用
+        #Calculation of raw material storage costs
         milk_cost = self.inventory["milk"] * 0.0001
         beans_cost = self.inventory["beans"] * 0.001
         spices_cost = self.inventory["spices"] * 0.001
         return milk_cost + beans_cost + spices_cost
 
     # def update_labor(self):
-    #     #初始的更新劳动力
+    #     #Initially update labour force
     #     self.labor = len(self.barista) * 80 * 60
 
-    def update_labor(self): #更新劳动力
-        #重置劳动力
+    def update_labor(self): #Updating the labour force
+        #reset the labour force
         for coffee in self.labor:
             self.labor[coffee] = 0
-        #根据专长更新劳动力
+        #update labour by specialty
         for barista in self.barista:
             specialty = barista.get_specialty()
             if specialty:
@@ -46,57 +46,57 @@ class CoffeeShop:       #缺少错误处理
 
 
     def add_barista(self, barista_name, specialty = None):
-        #添加咖啡师
-        #检查咖啡师名字是否已经存在
+        #add barista
+        #check if existence
         for barista in self.barista:
             if barista.get_name() == barista_name:
-                print(f"咖啡师 {barista_name} 已存在，请输入不同的名字。")
-                return  #提前结束方法
+                input(f"barista {barista_name} already existing, Please retype.")
+                return  
         new_barista = Barista(barista_name, specialty)
         self.barista.append(new_barista)
-        # self.update_labor()  #更新劳动力
-        print(f"咖啡师 {barista_name} 已添加到员工名单。")
+        # self.update_labor()  #update labour
+        print(f"barista {barista_name} Added to staff list.")
 
     def remove_barista(self, barista_name):
-        #移除咖啡师
+        #Remove barista
         for barista in self.barista:
             if barista.get_name() == barista_name:
                 self.barista.remove(barista)
-                print(f"咖啡师 {barista_name} 被移除。")
-                # self.update_labor()  #更新劳动力
+                print(f"barista {barista_name} removed.")
+                # self.update_labor()  #update labour
                 break
-        else:   #循环正常结束时执行
-            print(f"咖啡师 {barista_name} 不存在于员工名单中。")
+        else:   #Executed when the loop ends normally
+            input(f"barista {barista_name} Does not exist in employee list.")
 
     def cash_spend(self):
-        #不包含购买原料的花销
+        #Does not include the cost of purchasing raw materials
         wage = len(self.barista)*15*120
         return wage + self.rent
 
     # def is_labor_sufficient(self, coffee_type, quantity):
-    #     #初始的检查是否有足够的劳动力
+    #     #Initial check to see if there is enough labor
     #     required_labor = quantity * self.labordemand.get_demand(coffee_type)
     #     return self.labor >= required_labor
 
-    def is_labor_sufficient(self, coffee_type, quantity):   #检查是否有足够的劳动力
+    def is_labor_sufficient(self, coffee_type, quantity):   #Check if there is enough labor
         required_labor = quantity * self.labordemand.get_demand(coffee_type)
         available_labor = self.labor["general"] + (self.labor[coffee_type] * 2)
         return available_labor >= required_labor
 
     def sell_coffee(self, coffee_type, quantity):
-        #检查是否有足够的原料
+        #Check if there are enough ingredients
         for ingredient, amount_per_unit in self.ingredient.coffee_recipes[coffee_type].items():
             if self.inventory[ingredient] < amount_per_unit * quantity:
-                print(f"原料不足，无法制作 {quantity} 杯 {coffee_type}")
+                print(f"Insufficient ingredient to make {quantity} cuos of  {coffee_type}")
                 return False
 
-        #计算收入并更新现金
+        #Calculate income and update cash
         price_per_cup = self.prices[coffee_type]
         income = quantity * price_per_cup
         self.cash += income
-        print(f"成功销售 {quantity} 杯 {coffee_type}，收入 {income}")
-        # self.labor -= quantity * self.labordemand.get_demand(coffee_type) #初始更新劳动力
-        #更新劳动力
+        print(f"successful sale {quantity} cup of  {coffee_type}, income {income}")
+        # self.labor -= quantity * self.labordemand.get_demand(coffee_type) #Initial Update Workforce
+        #updateworkforce
         required_labor = quantity * self.labordemand.get_demand(coffee_type)
         if self.labor[coffee_type] >= (required_labor/2):
             self.labor[coffee_type] -= (required_labor/2)
@@ -106,23 +106,23 @@ class CoffeeShop:       #缺少错误处理
         return True
 
     def calculate_production(self, coffee_type):
-        # 计算基于劳动力的最大产量
+        #Calculate the maximum output based on labor
         max_labor = (self.labor["general"] + (self.labor[coffee_type] * 2)) // self.labordemand.get_demand(coffee_type)
 
-        # 计算基于原料的最大产量
+        # Calculate the maximum output based on raw materials
         ingredient = self.ingredient.get_ingredient(coffee_type)
         max_ingredients = min(self.inventory[ingredient] // amount for ingredient, amount in ingredient.items())
 
-        # 返回两者中的最小值
+        #Returns the minimum of the two
         return min(max_labor, max_ingredients)
 
     def inventory_depreciation(self):
-        #计算折旧
+        #Calculate depreciation
         self.inventory["milk"] *= 0.6
         self.inventory["beans"] *= 0.9
 
     def update_inventory(self, coffee_type, quantity):
-        #根据咖啡类型和数量更新库存
+        #Update inventory based on coffee type and quantity
         recipe = self.ingredient.get_ingredient(coffee_type)
         if recipe:
             for ingredient, amount_per_unit in recipe.items():
@@ -132,7 +132,7 @@ class CoffeeShop:       #缺少错误处理
             print(f"未知的咖啡类型: {coffee_type}")
 
     def buy_ingredient(self):
-        #购买原材料并加满仓库，更新现金
+        #Buy raw materials and fill up the warehouse, update cash
         buy_milk = (300000 - self.inventory["milk"]) * 0.0003
         buy_beans = (20000 - self.inventory["beans"]) * 0.1
         buy_spices = (4000- self.inventory ["spices"]) * 0.05
@@ -140,12 +140,12 @@ class CoffeeShop:       #缺少错误处理
         self.cash -= (buy_milk + buy_beans + buy_spices)
     
     def current(self):
-        #显示咖啡店的当前状态
-        print(f"Cash surplus: {self.cash}")  #打印剩余现金
-        print("Inventory:", self.inventory) #打印库存 
+        #Display the current status of the coffee shop
+        print(f"Cash surplus: {self.cash}")  #print remaining cash
+        print("Inventory:", self.inventory) #printstock 
         for barista in self.barista:
             name = barista.get_name()
-            specialty = barista.get_specialty() if barista.get_specialty() else "无专长"
-            print(f"咖啡师 {name}，专长：{specialty}")     
+            specialty = barista.get_specialty() if barista.get_specialty() else "no specialty"
+            print(f"barista {name}，specialty：{specialty}")     
 
 

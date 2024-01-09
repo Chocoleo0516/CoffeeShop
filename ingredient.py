@@ -1,6 +1,6 @@
 class Ingredient:
     def __init__(self):
-        # 定义每种咖啡所需原料的单位消耗量
+        # Define the unit consumption of raw materials required for each coffee
         self.coffee_recipes = {
             "Espresso": {"beans": 8},
             "Americano": {"beans": 6},
@@ -11,5 +11,5 @@ class Ingredient:
         }
 
     def get_ingredient(self, coffee_type):
-        # 返回指定咖啡类型所需的原料量
+        #Returns the amount of ingredients required for the specified coffee type
         return self.coffee_recipes[coffee_type]

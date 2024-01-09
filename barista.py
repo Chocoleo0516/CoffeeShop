@@ -1,5 +1,5 @@
 class Barista:
-    #储存咖啡师的名字
+    #Store the barista's name
     def __init__(self, name, specialty = None):
         self.name = name
         self.specialty = specialty
